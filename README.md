@@ -1,2 +1,4 @@
-# Basic Calculator
-A basic calculator completely written in C with WinAPI. More details soon.
+# Basic Calculator V1.0
+A basic calculator written in C with WinAPI. It can do add, subtract, multiply and divide.
+
+Copyright Arnav Bhatt 2019. Icons are taken from ReactOS source code.

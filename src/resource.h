@@ -21,5 +21,12 @@
 #define IDB_DECIMAL 18
 #define IDB_C 19
 
-#define IDI_ICON_SMALL 20
-#define IDI_ICON 21
+#define IDM_MENU 20
+
+#define IDI_ICON_SMALL 22
+#define IDI_ICON 23
+
+#define ID_FILE_ABOUT 24
+#define ID_FILE_EXIT 25
+
+#define IDD_ABOUT 26

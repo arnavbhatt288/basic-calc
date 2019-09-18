@@ -1,15 +1,39 @@
 /*
-* Program: Calculator V0.5
-*	
+* Program: Calculator v1.0
+*
 * Copyright Arnav Bhatt 2019
 */
 
 #include <windows.h>
 #include <string.h>
 #include <stdlib.h>
+#include <strsafe.h>
 #include "resource.h"
 
-BOOL CALLBACK DlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
+HMENU hMenu, hSubMenu;
+
+BOOL CALLBACK AboutDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
+{
+    switch(Message)
+    {
+        case WM_INITDIALOG:
+
+        return TRUE;
+        case WM_COMMAND:
+            switch(LOWORD(wParam))
+            {
+                case IDOK:
+                    EndDialog(hwnd, IDOK);
+                break;
+            }
+        break;
+        default:
+            return FALSE;
+    }
+    return TRUE;
+}
+
+BOOL CALLBACK MainDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
 {
  	int len;
     static char* buf = NULL;
@@ -21,7 +45,19 @@ BOOL CALLBACK DlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
 	switch(Message)
     {
         case WM_INITDIALOG:
+
+            hMenu = CreateMenu();
+
+            hSubMenu = CreatePopupMenu();
+			AppendMenu(hSubMenu, MF_STRING, ID_FILE_ABOUT, "&About");;
+            AppendMenu(hSubMenu, MF_STRING, ID_FILE_EXIT, "E&xit");
+            AppendMenu(hMenu, MF_STRING | MF_POPUP, (UINT)hSubMenu, "&File");
+
+            SetMenu(hwnd, hMenu);			
+
 			SetDlgItemText(hwnd, IDE_DISPLAY, "0");
+			
+			SendMessage(GetDlgItem(hwnd, IDE_DISPLAY), EM_LIMITTEXT, (WPARAM)28, 0); 
 			SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)LoadIcon(NULL, MAKEINTRESOURCE(IDI_ICON_SMALL)));
 			SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)LoadIcon(NULL, MAKEINTRESOURCE(IDI_ICON)));
 		break;
@@ -219,8 +255,24 @@ BOOL CALLBACK DlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
 						break;
 					}
 					
-					snprintf(sAns, 256, "%f", ans);
+					int ians = (int)ans;
+
+					if(ans - ians == 0)
+						StringCchPrintfA(sAns, sizeof(sAns), "%i", ians);
+					else
+						StringCchPrintfA(sAns, sizeof(sAns), "%f", ans);
+					
 					SetDlgItemText(hwnd, IDE_DISPLAY, sAns);
+				break;
+
+				case ID_FILE_ABOUT:
+					DialogBox(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_ABOUT), hwnd, AboutDlgProc);
+				break;
+
+				case ID_FILE_EXIT:
+					GlobalFree(buf);
+					memset(sAns, 0, sizeof sAns);
+					EndDialog(hwnd, 0);
 				break;
 			}
         break;
@@ -237,5 +289,5 @@ BOOL CALLBACK DlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, 
     LPSTR lpCmdLine, int nCmdShow)
 {
-    return DialogBox(hInstance, MAKEINTRESOURCE(IDD_MAIN), NULL, DlgProc);
+    return DialogBox(hInstance, MAKEINTRESOURCE(IDD_MAIN), NULL, MainDlgProc);
 }
